@@ -4,9 +4,9 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+
 
 public class TestPositive {
     private WebDriver driver;
@@ -17,36 +17,51 @@ public class TestPositive {
     }
 
     @BeforeEach
-    public void beforeEach() {
+    void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--no-sandbox");
         options.addArguments("--headless");
-        ChromeDriver driver = new ChromeDriver(options);
-        driver.get("https://localhost:9999");
+        driver = new ChromeDriver(options);
+        driver.get("http://localhost:9999");
     }
 
     @AfterEach
-    public void afterEach() {
+    void tearDown() {
         driver.quit();
         driver = null;
     }
 
     @Test
-    public void shouldFillInForm() {
-        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Кривоносова Зоя Раисовна");
-        driver.findElement(By.cssSelector("data-test-id='phone'] input")).sendKeys("+71254325674");
+    void shouldTestPositive() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Марк Аврелий");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79156398472");
         driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
         driver.findElement(By.cssSelector("button")).click();
-        WebElement actualElement = driver.findElement(By.cssSelector("[data-test-id =order-success]"));
-        String actualText = actualElement.getText().trim();
-        Assertions.assertEquals("Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайщее время.", actualText);
-        Assertions.assertTrue(actualElement.isDisplayed());
+        String expected = "  Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
+        String actual = driver.findElement(By.cssSelector("[data-test-id=order-success]")).getText();
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldTestPositivResultDoubleSurname() {
+        driver.findElement(By.cssSelector("[data-test-id='name'] input")).sendKeys("Юсупов-Шишкин Марк");
+        driver.findElement(By.cssSelector("[data-test-id='phone'] input")).sendKeys("+79188651864");
+        driver.findElement(By.cssSelector("[data-test-id='agreement']")).click();
+        driver.findElement(By.cssSelector("button")).click();
+        String expected = "  Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
+        String actual = driver.findElement(By.cssSelector("[data-test-id=order-success]")).getText();
+        Assertions.assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldTestPositivResultDoubleName() {
+        driver.findElement(By.cssSelector("[data-test-id=name] input")).sendKeys("Кузнецов Олег");
+        driver.findElement(By.cssSelector("[data-test-id=phone] input")).sendKeys("+79758994242");
+        driver.findElement(By.cssSelector("[data-test-id=agreement]")).click();
+        driver.findElement(By.className("button")).click();
+        String expected = "  Ваша заявка успешно отправлена! Наш менеджер свяжется с вами в ближайшее время.";
+        String actual = driver.findElement(By.cssSelector("[data-test-id=order-success]")).getText();
+        Assertions.assertEquals(expected, actual);
     }
 }
-
-
-
-
-
-
